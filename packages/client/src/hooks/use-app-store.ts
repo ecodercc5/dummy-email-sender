@@ -64,6 +64,7 @@ export enum ActionType {
   Next = "Next",
   Back = "Back",
   Reset = "Reset",
+  SetEmail = "SetEmail",
 }
 
 export type ImportSpreadSheetAction = {
@@ -88,12 +89,30 @@ export type ResetAction = {
   type: ActionType.Reset;
 };
 
+export type SetEmailAction = {
+  type: ActionType.SetEmail;
+  email: IEmail;
+};
+
 export type Actions =
   | ImportSpreadSheetAction
   | SelectNewSpreadSheetAction
   | NextAction
   | BackAction
-  | ResetAction;
+  | ResetAction
+  | SetEmailAction;
+
+const INITIAL_STATE: AppState = {
+  type: Step.ImportSpreadSheet,
+  sheet: {
+    imported: false,
+  },
+  email: {
+    to: "",
+    subject: "",
+    body: "",
+  },
+};
 
 const reducer = (state: AppState, action: Actions): Partial<AppState> => {
   switch (action.type) {
@@ -175,16 +194,15 @@ const reducer = (state: AppState, action: Actions): Partial<AppState> => {
     }
     case ActionType.Reset: {
       if (state.type === Step.Success) {
+        return INITIAL_STATE;
+      }
+
+      return state;
+    }
+    case ActionType.SetEmail: {
+      if (state.type === Step.WriteEmail) {
         return {
-          type: Step.ImportSpreadSheet,
-          sheet: {
-            imported: false,
-          },
-          email: {
-            to: "",
-            subject: "",
-            body: "",
-          },
+          email: action.email,
         };
       }
 
@@ -198,14 +216,6 @@ interface IDispatch {
 }
 
 export const useAppStore = create<AppState & IDispatch>((set) => ({
-  type: Step.ImportSpreadSheet,
-  sheet: {
-    imported: false,
-  },
-  email: {
-    to: "",
-    subject: "",
-    body: "",
-  },
+  ...INITIAL_STATE,
   dispatch: (action) => set((state) => reducer(state, action)),
 }));

@@ -28,8 +28,6 @@ export const SummaryCard: React.FC<Props> = () => {
 
   const handleSendEmails = () => {
     trigger().then(next);
-
-    // next()
   };
 
   return (

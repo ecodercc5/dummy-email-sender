@@ -15,13 +15,6 @@ interface ISpreadSheetParams {
   range: string;
 }
 
-// getting spreadsheet
-app.get(
-  "/api/spreadsheets",
-  getSheet((req) => req.query as unknown as ISpreadSheetParams),
-  Middleware.getSpreadSheet
-);
-
 // gettting sheet from spreadsheets
 app.get("/api/spreadsheets/:spreadSheetId/sheets/:gid", async (req, res) => {
   const { spreadSheetId, gid } = req.params;

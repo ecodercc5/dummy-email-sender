@@ -30,24 +30,10 @@ const text = (
 
 const testFetch = (): ISheet => ({
   id: "asdf",
-  headers: ["Whrolly", "Anderson"],
+  headers: ["Email", "Name"],
   rows: [
-    { Whrolly: "Hello", Anderson: "World" },
-    { Whrolly: "Hello", Anderson: "World" },
-    { Whrolly: "Hello", Anderson: "World" },
-    { Whrolly: "Hello", Anderson: "World" },
-    { Whrolly: "Hello", Anderson: "World" },
-    { Whrolly: "Hello", Anderson: "World" },
-    { Whrolly: "Hello", Anderson: "World" },
-    { Whrolly: "Hello", Anderson: "World" },
-    { Whrolly: "Hello", Anderson: "World" },
-    { Whrolly: "Hello", Anderson: "World" },
-    { Whrolly: "Hello", Anderson: "World" },
-    { Whrolly: "Hello", Anderson: "World" },
-    { Whrolly: "Hello", Anderson: "World" },
-    { Whrolly: "Hello", Anderson: "World" },
-    { Whrolly: "Hello", Anderson: "World" },
-    { Whrolly: "Hello", Anderson: "World" },
+    { Email: "eric25@mit.edu", Name: "Eric" },
+    { Email: "sharan@bu.edu", Name: "Sharan" },
   ],
   range: "Sasdf",
 });

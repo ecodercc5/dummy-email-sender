@@ -27,7 +27,7 @@ export const PreviewTableCard: React.FC<Props> = () => {
 
           <div className="flex flex-col h-full flex-1">
             <Dialog.Root>
-              <Dialog.Trigger>
+              <Dialog.Trigger asChild>
                 <button
                   onClick={() => {
                     console.log("yo");

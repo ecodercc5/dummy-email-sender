@@ -6,6 +6,7 @@ import { WriteEmailCard } from "./containers/WriteEmailCard";
 import { SummaryCard } from "./containers/SummaryCard";
 import { SuccessCard } from "./containers/SuccessCard";
 import { Step, useAppStore } from "./hooks/use-app-store";
+import { fill } from "./utils";
 
 function App() {
   const type = useAppStore((state) => state.type);

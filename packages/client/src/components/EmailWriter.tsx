@@ -23,17 +23,20 @@ export const EmailWriter: React.FC<Props> = ({
     <div className={`flex flex-col ${className}`} {...props}>
       <EmailInput
         withDivider
+        dataLabel="to"
         label="To"
         value={to}
         onValueChange={(value) => onEmailChange({ ...email, to: value })}
       />
       <EmailInput
         withDivider
+        dataLabel="subject"
         label="Subject"
         value={subject}
         onValueChange={(value) => onEmailChange({ ...email, subject: value })}
       />
       <EmailInput
+        dataLabel="body"
         className="h-full"
         variant="textarea"
         label="Compose Email"

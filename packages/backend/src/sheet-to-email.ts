@@ -1,6 +1,6 @@
 import { IEmail } from "./email";
 import { IGoogleSheet } from "./apis/google-sheets";
-import { Template, TemplateFill } from "./template";
+import { TemplateFill } from "./template";
 
 // toHeader: What column is the email field underneath
 export const createSpreadSheetToEmails = (

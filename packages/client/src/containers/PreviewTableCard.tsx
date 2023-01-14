@@ -1,15 +1,12 @@
 import React from "react";
 import { Card } from "../components/Card";
-import { ArrowUpTrayIcon, UserGroupIcon } from "@heroicons/react/24/outline";
 import { TableCellsIcon } from "@heroicons/react/20/solid";
 import { Button } from "../components/Button";
-import { SMALL_ICON } from "../icon-styles";
-import { useStateStore } from "../hooks/state-store";
 import { InstructionSection } from "../components/InstructionSection";
 import { SheetTable } from "../components/SheetTable";
-import { ActionType, Step, useAppStore } from "../hooks/use-app-store";
 import { useNavigate } from "../hooks/use-navigate";
 import { useSheet } from "../hooks/use-sheet";
+import * as Dialog from "@radix-ui/react-dialog";
 
 interface Props {}
 
@@ -18,9 +15,9 @@ export const PreviewTableCard: React.FC<Props> = () => {
   const [next, back] = useNavigate();
 
   return (
-    <Card className="relative flex flex-col w-full max-w-[974px] h-[584px]">
+    <Card className="relative flex flex-col w-full max-w-[974px] h-[584px] overflow-y-hidden">
       <div className="flex flex-col gap-9 px-7 pt-9 pb-7 w-full h-full">
-        <div className="flex flex-col gap-7">
+        <div className="flex flex-col gap-7 h-full">
           <InstructionSection
             icon={TableCellsIcon}
             header="Preview Spreadsheet"
@@ -28,8 +25,31 @@ export const PreviewTableCard: React.FC<Props> = () => {
             consectetur."
           />
 
-          <div>
-            <SheetTable className="w-full" sheet={sheet} />
+          <div className="flex flex-col h-full flex-1">
+            <Dialog.Root>
+              <Dialog.Trigger>
+                <button
+                  onClick={() => {
+                    console.log("yo");
+                  }}
+                >
+                  Expand
+                </button>
+              </Dialog.Trigger>
+              <Dialog.Portal>
+                <Dialog.Overlay className="DialogOverlay" />
+                <Dialog.Content className="DialogContent">
+                  <Dialog.Close>
+                    <button>Close</button>
+                  </Dialog.Close>
+                  <SheetTable className="w-full" sheet={sheet} />
+                </Dialog.Content>
+              </Dialog.Portal>
+            </Dialog.Root>
+
+            <div className="overflow-scroll">
+              <SheetTable className="w-full" sheet={sheet} />
+            </div>
           </div>
         </div>
       </div>

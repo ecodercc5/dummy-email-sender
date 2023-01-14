@@ -7,7 +7,10 @@ import { SMALL_ICON } from "../icon-styles";
 import { InstructionSection } from "../components/InstructionSection";
 import useSWR from "swr";
 import { getSpreadSheet } from "../api";
-import { useAppStore } from "../hooks/use-app-store";
+import { ActionType, useAppStore } from "../hooks/use-app-store";
+import { ISheet } from "../core";
+import { useNavigate } from "../hooks/use-navigate";
+import { useDispatch } from "../hooks/use-dispatch";
 
 interface Props {}
 
@@ -25,24 +28,49 @@ const text = (
   </>
 );
 
+const testFetch = (): ISheet => ({
+  id: "asdf",
+  headers: ["Whrolly", "Anderson"],
+  rows: [{ Whrolly: "Hello", Anderson: "World" }],
+  range: "Sasdf",
+});
+
 export const ImportSpreadSheetCard: React.FC<Props> = () => {
-  const appState = useAppStore();
+  const sheet = useAppStore((state) => state.sheet);
+  const dispatch = useDispatch();
+
+  const [next] = useNavigate();
+
+  const [shouldImport, setShouldImport] = useState(false);
   const [googleSheetLink, setGoogleSheetLink] = useState("");
   const key = ["/api/spreadsheets/:id/sheets/:gid", googleSheetLink];
-  const { mutate } = useSWR(key);
+  const { isLoading, mutate } = useSWR<ISheet>(
+    shouldImport ? key : null,
+    // () => getSpreadSheet(googleSheetLink),
+    testFetch,
+    {
+      onSuccess: (sheet) =>
+        dispatch({
+          type: ActionType.ImportSpreadSheet,
+          link: googleSheetLink,
+          data: sheet!,
+        }),
+    }
+  );
 
-  const canContinue = appState.canContinue();
+  const canContinue = sheet.imported;
 
-  const handleImportSheet = () => {
-    mutate(() => getSpreadSheet(googleSheetLink)).then((sheet) => {
-      // console.log(`[imported sheet]`);
-      // console.log(sheet);
-
-      appState.importSpreadSheet(googleSheetLink, sheet);
-    });
+  const selectNewSpreadSheet = () => {
+    // clear cache for key so that it refetches with isLoading=true on future attempts
+    mutate(undefined, false);
+    setShouldImport(false);
+    setGoogleSheetLink("");
+    dispatch({ type: ActionType.SelectNewSpreadSheet });
   };
 
-  console.log(appState);
+  const handleImportSheet = () => {
+    setShouldImport(true);
+  };
 
   return (
     <Card className="flex w-full max-w-[974px] h-[584px]">
@@ -53,8 +81,8 @@ export const ImportSpreadSheetCard: React.FC<Props> = () => {
           text={text}
         />
 
-        {appState.sheetImported ? (
-          <button onClick={appState.selectNewSpreadSheet}>Import New X</button>
+        {sheet.imported ? (
+          <button onClick={selectNewSpreadSheet}>Import New X</button>
         ) : (
           <div className="flex flex-col items-stretch">
             <IconInput
@@ -66,6 +94,7 @@ export const ImportSpreadSheetCard: React.FC<Props> = () => {
             />
 
             <Button className="mt-4" size="lg" onClick={handleImportSheet}>
+              {isLoading ? "Loading" : null}
               Import
             </Button>
           </div>
@@ -73,7 +102,7 @@ export const ImportSpreadSheetCard: React.FC<Props> = () => {
       </div>
 
       <div className="flex justify-end items-end pb-7 px-7 left-img w-full bg-[url('https://images.unsplash.com/photo-1604079628040-94301bb21b91?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80')]">
-        <Button size="lg" disabled={!canContinue} onClick={appState.next}>
+        <Button size="lg" disabled={!canContinue} onClick={next}>
           Continue
         </Button>
       </div>

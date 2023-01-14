@@ -13,18 +13,12 @@ import { EmailWriter } from "../components/EmailWriter";
 import { Divider } from "../components/Divider";
 import { InstructionSection } from "../components/InstructionSection";
 import { useStateStore } from "../hooks/state-store";
+import { useNavigate } from "../hooks/use-navigate";
 
 interface Props {}
 
 export const WriteEmailCard: React.FC<Props> = () => {
-  const sheet = useStateStore((state) => state.sheet!);
-  const [email, setEmail] = useStateStore((state) => [
-    state.email,
-    state.setEmail,
-  ]);
-
-  const next = useStateStore((state) => state.next);
-  const back = useStateStore((state) => state.back);
+  const [next, back] = useNavigate();
 
   return (
     <Card className="relative flex w-full max-w-[974px] h-[584px]">
@@ -38,9 +32,9 @@ export const WriteEmailCard: React.FC<Props> = () => {
           />
 
           <div className="flex flex-wrap gap-2">
-            {sheet.headers.map((name) => {
+            {/* {sheet.headers.map((name) => {
               return <Tag key={name}>{name}</Tag>;
-            })}
+            })} */}
           </div>
         </div>
 
@@ -54,11 +48,11 @@ export const WriteEmailCard: React.FC<Props> = () => {
       <Divider variant="vertical" />
 
       <div className="flex flex-col pt-5 pb-7 px-7 left-img w-full">
-        <EmailWriter
+        {/* <EmailWriter
           className="w-full h-full"
           email={email}
           onEmailChange={setEmail}
-        />
+        /> */}
       </div>
 
       <div className="absolute flex gap-3 right-7 bottom-7">

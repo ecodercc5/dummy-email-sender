@@ -1,6 +1,7 @@
 import create from "zustand";
-import { ISheet } from "../core";
+import { ISheet, IEmail } from "../core";
 
+// states
 export enum Step {
   ImportSpreadSheet = "ImportSpreadSheet",
   PreviewSpreadSheet = "PreviewSpreadSheet",
@@ -8,21 +9,6 @@ export enum Step {
   Confirmation = "Confirmation",
   Success = "Success",
 }
-
-enum ActionType {
-  ImportSpreadSheet = "ImportSpreadSheet",
-  SelectNewSpreadSheet = "SelectNewSpreadSheet",
-  Next = "Next",
-  Back = "Back",
-}
-
-type Actions = {
-  importSpreadSheet(link: string, data: ISheet): void;
-  selectNewSpreadSheet(): void;
-  canContinue(): boolean;
-  next(): void;
-  back(): void;
-};
 
 type SpreadSheetImported = {
   link: string;
@@ -34,73 +20,82 @@ type SpreadSheetNotImported = {
   imported: false;
 };
 
-type Email = {
-  to: string;
-  subject: string;
-  body: string;
-};
+export interface IBaseAppState {
+  type: Step;
+  sheet: SpreadSheetImported | SpreadSheetNotImported;
+  email: IEmail;
+}
 
-type ImportSpreadSheetBaseState = { type: Step.ImportSpreadSheet };
-type PreviewSpreadSheetBaseState = { type: Step.PreviewSpreadSheet };
-type WriteEmailBaseState = { type: Step.WriteEmail };
-type ConfirmationBaseState = { type: Step.Confirmation };
-type SuccessBaseState = { type: Step.Success };
+export interface IImportSpreadSheetState extends IBaseAppState {
+  type: Step.ImportSpreadSheet;
+}
 
-type SpreadSheetImportedState = ImportSpreadSheetBaseState & {
+export interface IPreviewSpreadSheetState extends IBaseAppState {
+  type: Step.PreviewSpreadSheet;
   sheet: SpreadSheetImported;
-  email: Email;
-};
+}
 
-type SpreadSheetNotImportedState = ImportSpreadSheetBaseState & {
-  sheet: SpreadSheetNotImported;
-  email: Email;
-};
+export interface IWriteEmailState extends IBaseAppState {
+  type: Step.WriteEmail;
+  sheet: SpreadSheetImported;
+}
 
-type ImportSpreadSheetState =
-  | SpreadSheetImportedState
-  | SpreadSheetNotImportedState;
+export interface IConfirmationState extends IBaseAppState {
+  type: Step.Confirmation;
+  sheet: SpreadSheetImported;
+}
 
-type PreviewSpreadSheetState = PreviewSpreadSheetBaseState &
-  SpreadSheetImported;
+export interface ISuccessState extends IBaseAppState {
+  type: Step.Success;
+  sheet: SpreadSheetImported;
+}
 
-type WriteEmailState = WriteEmailBaseState & SpreadSheetImported;
-type ConfirmationState = ConfirmationBaseState & SpreadSheetImported;
-type SuccessState = SuccessBaseState & SpreadSheetImported;
+export type AppState =
+  | IImportSpreadSheetState
+  | IPreviewSpreadSheetState
+  | IWriteEmailState
+  | IConfirmationState
+  | ISuccessState;
 
-type AppState =
-  | ImportSpreadSheetState
-  | PreviewSpreadSheetState
-  | WriteEmailState
-  | ConfirmationState
-  | SuccessState;
+// actions
+export enum ActionType {
+  ImportSpreadSheet = "ImportSpreadSheet",
+  SelectNewSpreadSheet = "SelectNewSpreadSheet",
+  Next = "Next",
+  Back = "Back",
+  Reset = "Reset",
+}
 
-type ImportSpreadSheetAction = {
+export type ImportSpreadSheetAction = {
   type: ActionType.ImportSpreadSheet;
   link: string;
   data: ISheet;
 };
 
-type SelectNewSpreadSheetAction = {
+export type SelectNewSpreadSheetAction = {
   type: ActionType.SelectNewSpreadSheet;
 };
 
-type NextAction = {
+export type NextAction = {
   type: ActionType.Next;
 };
 
-type BackAction = {
+export type BackAction = {
   type: ActionType.Back;
 };
 
-type Actions_ =
+export type ResetAction = {
+  type: ActionType.Reset;
+};
+
+export type Actions =
   | ImportSpreadSheetAction
   | SelectNewSpreadSheetAction
   | NextAction
-  | BackAction;
+  | BackAction
+  | ResetAction;
 
-// type Actions =
-
-const reducer = (state: AppState, action: Actions_): Partial<AppState> => {
+const reducer = (state: AppState, action: Actions): Partial<AppState> => {
   switch (action.type) {
     case ActionType.ImportSpreadSheet: {
       const { data, link } = action;
@@ -178,10 +173,31 @@ const reducer = (state: AppState, action: Actions_): Partial<AppState> => {
       }
       return state;
     }
+    case ActionType.Reset: {
+      if (state.type === Step.Success) {
+        return {
+          type: Step.ImportSpreadSheet,
+          sheet: {
+            imported: false,
+          },
+          email: {
+            to: "",
+            subject: "",
+            body: "",
+          },
+        };
+      }
+
+      return state;
+    }
   }
 };
 
-export const useAppStore = create<AppState & Actions>((set, get) => ({
+interface IDispatch {
+  dispatch(action: Actions): void;
+}
+
+export const useAppStore = create<AppState & IDispatch>((set) => ({
   type: Step.ImportSpreadSheet,
   sheet: {
     imported: false,
@@ -191,112 +207,5 @@ export const useAppStore = create<AppState & Actions>((set, get) => ({
     subject: "",
     body: "",
   },
-  importSpreadSheet: (link, data) =>
-    set((state) => {
-      if (state.type === Step.ImportSpreadSheet && !state.sheet.imported) {
-        const newState: Partial<SpreadSheetImportedState> = {
-          type: Step.ImportSpreadSheet,
-          sheet: {
-            imported: true,
-            link,
-            data,
-          },
-        };
-
-        return newState;
-      }
-      return state;
-    }),
-  selectNewSpreadSheet: () =>
-    set((state) => {
-      if (state.type === Step.ImportSpreadSheet && state.sheet.imported) {
-        return {
-          sheet: {
-            imported: false,
-          },
-        };
-      }
-
-      return state;
-    }),
-  canContinue: () => {
-    const state = get();
-
-    switch (state.type) {
-      case Step.ImportSpreadSheet: {
-        return state.sheet.imported;
-      }
-      default:
-        return false;
-    }
-  },
-  next: () => {},
-  back: () => {},
+  dispatch: (action) => set((state) => reducer(state, action)),
 }));
-
-// importSpreadSheet: (googleSheetLink, sheet) =>
-//     set((state) => {
-//       if (state.type === Step.ImportSpreadSheet && !state.sheet.imported) {
-//         const { sheetImported, ...rest } = state;
-
-//         return {
-
-//         } as SpreadSheetImportedState;
-//       }
-//       return state;
-//     }),
-//   selectNewSpreadSheet: () =>
-//     set((state) => {
-//       if (state.type === Step.ImportSpreadSheet && state.sheetImported) {
-//         const { sheet, googleSheetLink, ...rest } = state;
-
-//         return {
-//           ...rest,
-//           type: Step.ImportSpreadSheet,
-//           sheetImported: false,
-//         };
-//       }
-
-//       return state;
-//     }),
-//   canContinue: () => {
-//     const state = get();
-
-//     switch (state.type) {
-//       case Step.ImportSpreadSheet: {
-//         return state.sheetImported;
-//       }
-//       default:
-//         return false;
-//     return false
-//     }
-//   },
-//   next: () =>
-//     set((state) => {
-//       if (state.type === Step.ImportSpreadSheet) {
-//         if (state.canContinue()) {
-//           const { type, ...rest } = state as SpreadSheetImportedState;
-
-//           return {
-//             ...rest,
-//             type: Step.PreviewSpreadSheet,
-//           } as PreviewSpreadSheetState;
-//         }
-
-//         return state;
-//       }
-
-//       return state;
-//     }),
-//   back: () =>
-//     set((state) => {
-//       switch (state.type) {
-//         case Step.PreviewSpreadSheet:
-//           return {
-//             ...state,
-//             type: Step.ImportSpreadSheet,
-//           } as SpreadSheetImportedState;
-//       }
-
-//       return state;
-//     }),

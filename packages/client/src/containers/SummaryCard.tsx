@@ -12,15 +12,15 @@ import { Tag } from "../components/Tag";
 import { EmailWriter } from "../components/EmailWriter";
 import { Divider } from "../components/Divider";
 import { SummaryDetail } from "../components/SummaryDetail";
-import { useStateStore } from "../hooks/state-store";
 import { InstructionSection } from "../components/InstructionSection";
+import { useNavigate } from "../hooks/use-navigate";
+import { useSheet } from "../hooks/use-sheet";
 
 interface Props {}
 
 export const SummaryCard: React.FC<Props> = () => {
-  const next = useStateStore((state) => state.next);
-  const back = useStateStore((state) => state.back);
-  const sheet = useStateStore((state) => state.sheet!);
+  const sheet = useSheet()!;
+  const [next, back] = useNavigate();
 
   return (
     <Card className="relative flex w-full max-w-[974px] h-[584px]">
@@ -34,8 +34,8 @@ export const SummaryCard: React.FC<Props> = () => {
         </div>
 
         <div className="flex flex-col gap-6">
-          <SummaryDetail edittable label="Sheet ID" detail={sheet.id} />
-          <SummaryDetail edittable label="Sheet Name" detail="Sheet 1" />
+          <SummaryDetail label="Sheet ID" detail={sheet.id} />
+          <SummaryDetail label="Sheet Name" detail="Sheet 1" />
           <SummaryDetail
             label="Number of Contacts"
             detail={`${sheet.rows.length}`}

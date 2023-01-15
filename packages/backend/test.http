@@ -5,14 +5,14 @@ POST http://localhost:8000/api/emails
 Content-Type: application/json
 
 {
-    "subject": "{{Name}} is your favorite color {{Color}}?",
-    "body": "Hello {{Name}}, it's Eric",
+    "email": {
+        "to": "{{Email}}",
+        "subject": "{{Name}} is your favorite color {{Color}}?",
+        "body": "Hello {{Name}}, it's Eric"
+    },
     "spreadSheetId": "1RRC6MRwxZJzaLFHP0Xnn-tdbWv5bfLeW7QTcKD5ytLs",
-    "range": "Sheet1"
+    "gid": 0
 }
-
-###
-GET http://localhost:8000/api/spreadsheets/1RRC6MRwxZJzaLFHP0Xnn-tdbWv5bfLeW7QTcKD5ytLs/sheets
 
 ###
 GET http://localhost:8000/api/spreadsheets/1RRC6MRwxZJzaLFHP0Xnn-tdbWv5bfLeW7QTcKD5ytLs/sheets/0

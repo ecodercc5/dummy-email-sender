@@ -3,23 +3,20 @@ import { IGoogleSheet } from "./apis/google-sheets";
 import { TemplateFill } from "./template";
 
 // toHeader: What column is the email field underneath
-export const createSpreadSheetToEmails = (
-  toHeader: string,
-  templateFill: TemplateFill
-) => {
+export const createSpreadSheetToEmails = (templateFill: TemplateFill) => {
   const spreadSheetToEmails = (
     sheet: IGoogleSheet,
-    template: { subject: string; body: string }
+    template: { to: string; subject: string; body: string }
   ): IEmail[] => {
-    const { subject, body } = template;
+    const { to, subject, body } = template;
 
     return sheet.rows.map((row) => {
-      const to = row[toHeader];
+      const toLine = templateFill(to, row);
       const subjectLine = templateFill(subject, row);
       const filledBody = templateFill(body, row);
 
       return {
-        to,
+        to: toLine,
         subject: subjectLine,
         body: filledBody,
       };

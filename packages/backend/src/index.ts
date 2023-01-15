@@ -1,8 +1,10 @@
-import express from "express";
+import express, { RequestHandler } from "express";
 import cors from "cors";
-import { getSheet } from "./middleware/sheet";
-import { Middleware } from "./middleware";
 import { GoogleSheets } from "./apis/google-sheets";
+import { IEmail } from "./email";
+import { Template } from "./template";
+import { createSpreadSheetToEmails } from "./sheet-to-email";
+import { OutlookEmailSender } from "./outlook-email-sender";
 
 const app = express();
 
@@ -10,20 +12,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-interface ISpreadSheetParams {
-  spreadSheetId: string;
-  range: string;
-}
+const createGetSpreadSheet = (secretsPath: string) => {
+  return async (spreadSheetId: string, gid: string) => {
+    const sheetsAPI = await GoogleSheets.createAPI(secretsPath);
 
-// gettting sheet from spreadsheets
-app.get("/api/spreadsheets/:spreadSheetId/sheets/:gid", async (req, res) => {
-  const { spreadSheetId, gid } = req.params;
-  const sheetsAPI = await GoogleSheets.createAPI("./secrets.json");
-
-  console.log("yoooo");
-
-  try {
-    // get spreadsheet
     const getSpreadhSheetsRes = await sheetsAPI.spreadsheets.get({
       spreadsheetId: spreadSheetId,
     });
@@ -42,6 +34,19 @@ app.get("/api/spreadsheets/:spreadSheetId/sheets/:gid", async (req, res) => {
       range: sheetTitle,
     });
 
+    return sheetData;
+  };
+};
+
+const getSpreadSheet = createGetSpreadSheet("./secrets.json");
+
+// gettting sheet from spreadsheets
+app.get("/api/spreadsheets/:spreadSheetId/sheets/:gid", async (req, res) => {
+  const { spreadSheetId, gid } = req.params;
+  console.log("yoooo");
+
+  try {
+    const sheetData = await getSpreadSheet(spreadSheetId, gid);
     console.log(sheetData);
 
     return res.json({
@@ -57,15 +62,35 @@ app.get("/api/spreadsheets/:spreadSheetId/sheets/:gid", async (req, res) => {
   }
 });
 
-// send emails
-app.post(
-  "/api/emails",
-  getSheet((req) => ({
-    spreadSheetId: req.body.spreadSheetId,
-    range: req.body.range,
-  })),
-  Middleware.sendEmails
-);
+interface ISendEmailsRequestBody {
+  spreadSheetId: string;
+  gid: string;
+  email: IEmail;
+}
+
+const templateFill = Template.createFill((variable) => `{{${variable}}}`);
+const spreadSheetToEmails = createSpreadSheetToEmails(templateFill);
+
+app.post("/api/emails", async (req, res) => {
+  const { spreadSheetId, gid, email } = req.body as ISendEmailsRequestBody;
+
+  try {
+    const sheetData = await getSpreadSheet(spreadSheetId, gid);
+    const emails = spreadSheetToEmails(sheetData, email);
+
+    console.log(emails);
+
+    // send emails
+    await OutlookEmailSender.sendEmails(emails);
+
+    return res.sendStatus(200);
+  } catch (err) {
+    console.error(err);
+    console.log("bad request");
+
+    return res.status(400).json({ error: "Bad Request" });
+  }
+});
 
 const PORT = process.env.PORT || 8000;
 

@@ -31,7 +31,12 @@ export const WizardCard: React.FC<React.PropsWithChildren<Props>> = ({
         className="w-full"
         activeIndex={activeIndex}
         numSteps={4}
-        stepLabels={["asdf", "qwer", "xcv", "ghjk"]}
+        stepLabels={[
+          "Import Contacts",
+          "Preview Spreadsheet",
+          "Write Email",
+          "Confirm",
+        ]}
       />
 
       {children}

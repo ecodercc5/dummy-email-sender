@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Card } from "../components/Card";
 import { PencilIcon } from "@heroicons/react/24/outline";
 import { Button } from "../components/Button";
@@ -13,6 +19,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { IEmail, ISheet } from "../core";
 import { useDispatch } from "../hooks/use-dispatch";
 import { fill } from "../utils";
+import { EmailPreviewDialog } from "../organisms/EmailPreviewDialog";
 
 interface Props {}
 
@@ -42,9 +49,6 @@ export const WriteEmailCard: React.FC<Props> = () => {
     emailDataLabels.forEach(([label, dataLabel]) => {
       const emailInput = document.querySelector(`*[data-label="${dataLabel}"]`);
       const listener = (e: any) => {
-        console.log(e);
-        console.log(e.relatedTarget);
-
         if (
           e.relatedTarget &&
           e.relatedTarget.getAttribute("data-label") === "tag"
@@ -79,7 +83,8 @@ export const WriteEmailCard: React.FC<Props> = () => {
     };
   }, [emailDataLabels, setEmail]);
 
-  console.log(email);
+  const canContinue =
+    email.to.length > 4 && email.subject.length > 0 && email.body.length > 0;
 
   return (
     <Card className="relative flex w-full max-w-[974px] h-[584px]">
@@ -110,8 +115,10 @@ export const WriteEmailCard: React.FC<Props> = () => {
             <Dialog.Portal>
               <Dialog.Overlay className="DialogOverlay" />
 
-              <Dialog.Content className="DialogContent">
-                <EmailPreview email={email} sheet={sheet} />
+              <Dialog.Content asChild>
+                <Card className="dialog-content w-[602px] h-[624px] p-5">
+                  <EmailPreviewDialog email={email} sheet={sheet} />
+                </Card>
               </Dialog.Content>
             </Dialog.Portal>
           </Dialog.Root>
@@ -132,48 +139,10 @@ export const WriteEmailCard: React.FC<Props> = () => {
         <Button variant="secondary" size="lg" onClick={back}>
           Back
         </Button>
-        <Button size="lg" onClick={next}>
+        <Button disabled={!canContinue} size="lg" onClick={next}>
           Continue
         </Button>
       </div>
     </Card>
-  );
-};
-
-interface IEmailPreviewProps {
-  email: IEmail;
-  sheet: ISheet;
-}
-
-const EmailPreview: React.FC<IEmailPreviewProps> = ({ email, sheet }) => {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const rows = sheet.rows;
-  const numContacts = rows.length;
-
-  const next = () =>
-    setActiveIndex(
-      activeIndex + 1 < numContacts ? activeIndex + 1 : activeIndex
-    );
-
-  const back = () =>
-    setActiveIndex(activeIndex - 1 >= 0 ? activeIndex - 1 : activeIndex);
-
-  const activeRow = rows[activeIndex];
-
-  console.log(activeRow);
-
-  const to = fill(email.to, activeRow);
-  const subject = fill(email.subject, activeRow);
-  const body = fill(email.body, activeRow);
-
-  return (
-    <div>
-      <button onClick={next}>Next</button>
-      <button onClick={back}>Back</button>
-
-      <div>To: {to}</div>
-      <div>Subject: {subject}</div>
-      <div>Body: {body}</div>
-    </div>
   );
 };

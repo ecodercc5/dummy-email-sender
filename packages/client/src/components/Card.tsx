@@ -6,14 +6,16 @@ interface Props
     HTMLDivElement
   > {}
 
-export const Card: React.FC<React.PropsWithChildren<Props>> = ({
-  children,
-  className,
-  ...props
-}) => {
-  return (
-    <div className={`card bg-white rounded-lg ${className}`} {...props}>
-      {children}
-    </div>
-  );
-};
+export const Card = React.forwardRef<HTMLDivElement, Props>(
+  ({ children, className, ...props }, ref) => {
+    return (
+      <div
+        ref={ref}
+        className={`card bg-white rounded-lg ${className}`}
+        {...props}
+      >
+        {children}
+      </div>
+    );
+  }
+);

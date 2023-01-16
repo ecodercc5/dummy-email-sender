@@ -11,6 +11,7 @@ import { ActionType, useAppStore } from "../hooks/use-app-store";
 import { ISheet } from "../core";
 import { useNavigate } from "../hooks/use-navigate";
 import { useDispatch } from "../hooks/use-dispatch";
+import { SummaryDetail } from "../components/SummaryDetail";
 
 interface Props {}
 
@@ -44,24 +45,30 @@ export const ImportSpreadSheetCard: React.FC<Props> = () => {
 
   const [next] = useNavigate();
 
+  const [error, setError] = useState("");
   const [shouldImport, setShouldImport] = useState(false);
   const [googleSheetLink, setGoogleSheetLink] = useState("");
   const key = ["/api/spreadsheets/:id/sheets/:gid", googleSheetLink];
   const { isLoading, mutate } = useSWR<ISheet>(
     shouldImport ? key : null,
-    // () => getSpreadSheet(googleSheetLink),
-    testFetch,
+    () => getSpreadSheet(googleSheetLink),
     {
-      onSuccess: (sheet) =>
+      onSuccess: (sheet) => {
+        setError("");
         dispatch({
           type: ActionType.ImportSpreadSheet,
           link: googleSheetLink,
           data: sheet!,
-        }),
+        });
+      },
+      onError: () => {
+        setError("Invalid Link");
+      },
     }
   );
 
   const canContinue = sheet.imported;
+  const canImport = !isLoading && googleSheetLink.length > 0;
 
   const selectNewSpreadSheet = () => {
     // clear cache for key so that it refetches with isLoading=true on future attempts
@@ -85,9 +92,20 @@ export const ImportSpreadSheetCard: React.FC<Props> = () => {
         />
 
         {sheet.imported ? (
-          <button onClick={selectNewSpreadSheet}>Import New X</button>
+          <div>
+            <SummaryDetail label="Sheet ID" detail={sheet.data.id} />
+            <Button
+              className="mt-4 w-full"
+              variant="secondary"
+              size="lg"
+              onClick={selectNewSpreadSheet}
+            >
+              Select New
+            </Button>
+          </div>
         ) : (
           <div className="flex flex-col items-stretch">
+            {error && <span className="mb-2 text-[#E23F3F]">{error}</span>}
             <IconInput
               value={googleSheetLink}
               className="w-full"
@@ -96,9 +114,13 @@ export const ImportSpreadSheetCard: React.FC<Props> = () => {
               onChange={(e) => setGoogleSheetLink(e.target.value)}
             />
 
-            <Button className="mt-4" size="lg" onClick={handleImportSheet}>
-              {isLoading ? "Loading" : null}
-              Import
+            <Button
+              disabled={!canImport}
+              className="mt-4"
+              size="lg"
+              onClick={handleImportSheet}
+            >
+              {isLoading ? "Importing" : "Import"}
             </Button>
           </div>
         )}

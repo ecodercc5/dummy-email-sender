@@ -6,9 +6,17 @@ import { WriteEmailCard } from "./containers/WriteEmailCard";
 import { SummaryCard } from "./containers/SummaryCard";
 import { SuccessCard } from "./containers/SuccessCard";
 import { Step, useAppStore } from "./hooks/use-app-store";
-import { fill } from "./utils";
+import { SquareIconButton } from "./components/SquareIconButton";
+import { ArrowsPointingOutIcon } from "@heroicons/react/24/outline";
+import { EmailPreview } from "./components/EmailPreview";
 
 function App() {
+  const email = {
+    to: "eric25@mit.edu",
+    subject: "Hello World",
+    body: "zxcvzxvc",
+  };
+
   const type = useAppStore((state) => state.type);
 
   const renderComponent = (step: Step) => {
@@ -35,6 +43,8 @@ function App() {
         <WizardCard className="w-full max-w-[974px]">
           {renderComponent(type)}
         </WizardCard>
+
+        {/* <EmailPreview email={email} currentIndex={0} numEmails={25} /> */}
       </div>
     </>
   );

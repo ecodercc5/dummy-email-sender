@@ -10,21 +10,26 @@ import { useNavigate } from "../hooks/use-navigate";
 import { useSheet } from "../hooks/use-sheet";
 import { useAppStore } from "../hooks/use-app-store";
 import useSWRMutation from "swr/mutation";
+import { sendEmails } from "../api";
 
 interface Props {}
 
 export const SummaryCard: React.FC<Props> = () => {
   const sheet = useSheet()!;
   const email = useAppStore((state) => state.email);
+  const sheetLink = useAppStore((state) =>
+    state.sheet.imported ? state.sheet.link : null
+  )!;
   const [next, back] = useNavigate();
 
-  const { trigger, isMutating } = useSWRMutation("/api/emails", () => {
-    console.log("sending fake emails");
+  const { trigger, isMutating } = useSWRMutation(
+    ["/api/emails", sheetLink],
+    () => {
+      console.log("sending emails");
 
-    return new Promise((resolve) => {
-      setTimeout(resolve, 2500);
-    });
-  });
+      return sendEmails(sheetLink, email);
+    }
+  );
 
   const handleSendEmails = () => {
     trigger().then(next);
@@ -55,6 +60,7 @@ export const SummaryCard: React.FC<Props> = () => {
 
       <div className="flex flex-col pt-5 pb-7 px-7 left-img w-full flex-1">
         <EmailWriter
+          writable={false}
           className="w-full h-full"
           email={email}
           onEmailChange={() => {}}
@@ -62,11 +68,16 @@ export const SummaryCard: React.FC<Props> = () => {
       </div>
 
       <div className="absolute flex gap-3 right-7 bottom-7">
-        <Button variant="secondary" size="lg" onClick={back}>
+        <Button
+          disabled={isMutating}
+          variant="secondary"
+          size="lg"
+          onClick={back}
+        >
           Back
         </Button>
-        <Button size="lg" onClick={handleSendEmails}>
-          Send Emails {isMutating && "Loadingggg"}
+        <Button disabled={isMutating} size="lg" onClick={handleSendEmails}>
+          {isMutating ? "Sending Emails" : "Send Emails"}
         </Button>
       </div>
     </Card>

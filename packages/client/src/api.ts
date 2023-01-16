@@ -1,4 +1,4 @@
-import { ISheet } from "./core";
+import { IEmail, ISheet } from "./core";
 
 const isGoogleSheetsURL = (link: string): boolean => {
   const url = new URL(link);
@@ -66,4 +66,19 @@ export const getSpreadSheet = (link: string): Promise<ISheet> => {
 
   // make api call to get spreadsheet
   return getSpreadSheetFromSpreadSheetIdAndGid(spreadSheetId, gid);
+};
+
+export const sendEmails = (googleSheetLink: string, email: IEmail) => {
+  const [spreadSheetId, gid] = getSpreadSheetIdAndGid(googleSheetLink);
+  const apiEndpoint = `http://localhost:8000/api/emails`;
+
+  const body = { spreadSheetId, gid, email };
+
+  return fetch(apiEndpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
 };

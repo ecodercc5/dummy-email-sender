@@ -8,6 +8,7 @@ type Props = React.DetailedHTMLProps<
   React.HTMLAttributes<HTMLDivElement>,
   HTMLDivElement
 > & {
+  writable?: boolean;
   label: string;
   dataLabel: string;
   variant?: Variant;
@@ -17,6 +18,7 @@ type Props = React.DetailedHTMLProps<
 };
 
 export const EmailInput: React.FC<Props> = ({
+  writable = true,
   label,
   dataLabel: dataLabel_,
   variant = "inline",
@@ -37,18 +39,21 @@ export const EmailInput: React.FC<Props> = ({
         <div className="flex">
           <span className="text-blue-gray text-lg mr-2">{label}:</span>
           <div>
-            <input
-              data-label={dataLabel}
-              className="h-full w-full outline-none text-main-black text-lg"
-              value={value}
-              onChange={handleChange}
-              onBlur={(e) => {
-                console.log(e);
-              }}
-            />
+            {writable ? (
+              <input
+                data-label={dataLabel}
+                className="h-full w-full outline-none text-main-black text-lg"
+                value={value}
+                onChange={handleChange}
+              />
+            ) : (
+              <span className="h-full w-full text-main-black text-lg">
+                {value}
+              </span>
+            )}
           </div>
         </div>
-      ) : (
+      ) : writable ? (
         <textarea
           data-label={dataLabel}
           className="resize-none text-main-black text-lg placeholder:text-blue-gray outline-none h-full w-full"
@@ -56,6 +61,8 @@ export const EmailInput: React.FC<Props> = ({
           value={value}
           onChange={handleChange}
         ></textarea>
+      ) : (
+        <span className="text-main-black text-lg h-full w-full">{value}</span>
       )}
 
       {withDivider ? <Divider className="mt-3" /> : null}

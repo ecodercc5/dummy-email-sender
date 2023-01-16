@@ -91,7 +91,10 @@ export namespace OutlookEmailSender {
     await new Promise((r) => setTimeout(r, 5000));
 
     await page.waitForFunction(
-      "window.location.href === 'https://outlook.office.com/mail/'"
+      "window.location.href === 'https://outlook.office.com/mail/'",
+      {
+        timeout: 60000,
+      }
     );
 
     await new Promise((r) => setTimeout(r, 5000));

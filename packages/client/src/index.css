@@ -129,6 +129,23 @@ button:disabled {
   background: them("colors.light-gray");
 }
 
+.square-icon-btn {
+  width: 28px;
+  height: 28px;
+  background: #ffffff;
+  box-shadow: 0px 0px 0px 1px rgba(110, 117, 138, 0.24);
+  border-radius: 4px;
+  transition: all 150ms ease-out;
+}
+
+.square-icon-btn:hover {
+  background: #efefef;
+}
+
+.square-icon-btn:active {
+  background: #dedede;
+}
+
 .input-primary {
   box-shadow: 0px 3px 6px rgba(110, 117, 138, 0.12),
     0px 0px 0px 1px rgba(110, 117, 138, 0.24);
@@ -193,10 +210,19 @@ table {
   font-size: 16px;
 }
 
+tbody {
+  overflow-y: scroll;
+}
+
 th {
   background: theme("colors.light-gray");
   color: theme("colors.main-black");
   font-weight: 700;
+}
+
+thead tr td {
+  position: sticky;
+  top: 0;
 }
 
 th,
@@ -214,6 +240,7 @@ th {
 
 td {
   border-bottom: none;
+  background: #fff;
 }
 
 tr th:first-child,
@@ -236,20 +263,27 @@ td:last-child {
   position: fixed;
   inset: 0;
   animation: overlayShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  backdrop-filter: blur(1px);
 }
 
 .DialogContent {
-  background-color: white;
-  border-radius: 6px;
-  box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px,
-    hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 90vw;
-  max-width: 450px;
-  max-height: 85vh;
-  padding: 25px;
+  width: 100%;
+  max-width: 974px;
+  height: 584px;
   animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 100;
+  outline: none;
 }
+
+.dialog-content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/*  */

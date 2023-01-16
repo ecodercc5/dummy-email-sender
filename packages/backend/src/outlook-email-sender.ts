@@ -102,5 +102,7 @@ export namespace OutlookEmailSender {
     console.log("[sending emails]");
 
     await sendAllEmails(page, emails);
+
+    await page.close();
   };
 }

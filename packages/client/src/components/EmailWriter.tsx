@@ -32,7 +32,7 @@ export const EmailWriter: React.FC<Props> = ({
   const handleBodyChange = (body: string) => onEmailChange_({ ...email, body });
 
   return (
-    <div className={`flex flex-col ${className}`} {...props}>
+    <div className={`flex flex-col min-h-0 h-full ${className}`} {...props}>
       <EmailInput
         writable={writable}
         withDivider
@@ -52,7 +52,7 @@ export const EmailWriter: React.FC<Props> = ({
       <EmailInput
         writable={writable}
         dataLabel="body"
-        className="h-full"
+        className="h-full overflow-scroll"
         variant="textarea"
         label="Compose Email"
         value={body}

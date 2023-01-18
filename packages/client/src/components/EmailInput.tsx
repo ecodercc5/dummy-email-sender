@@ -38,20 +38,19 @@ export const EmailInput: React.FC<Props> = ({
       {variant === "inline" ? (
         <div className="flex">
           <span className="text-blue-gray text-lg mr-2">{label}:</span>
-          <div>
-            {writable ? (
-              <input
-                data-label={dataLabel}
-                className="h-full w-full outline-none text-main-black text-lg"
-                value={value}
-                onChange={handleChange}
-              />
-            ) : (
-              <span className="h-full w-full text-main-black text-lg">
-                {value}
-              </span>
-            )}
-          </div>
+
+          {writable ? (
+            <input
+              data-label={dataLabel}
+              className="inline-block h-full w-full outline-none text-main-black text-lg"
+              value={value}
+              onChange={handleChange}
+            />
+          ) : (
+            <span className="h-full w-full text-main-black text-lg">
+              {value}
+            </span>
+          )}
         </div>
       ) : writable ? (
         <textarea
@@ -62,7 +61,12 @@ export const EmailInput: React.FC<Props> = ({
           onChange={handleChange}
         ></textarea>
       ) : (
-        <span className="text-main-black text-lg h-full w-full">{value}</span>
+        <div
+          className="text-main-black text-lg h-full w-full"
+          style={{ whiteSpace: "pre-wrap" }}
+        >
+          {value}
+        </div>
       )}
 
       {withDivider ? <Divider className="mt-3" /> : null}

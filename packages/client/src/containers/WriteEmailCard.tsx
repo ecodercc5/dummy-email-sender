@@ -86,6 +86,8 @@ export const WriteEmailCard: React.FC<Props> = () => {
   const canContinue =
     email.to.length > 4 && email.subject.length > 0 && email.body.length > 0;
 
+  console.log(email);
+
   return (
     <Card className="relative flex w-full max-w-[974px] h-[584px]">
       <div className="flex flex-col justify-between px-7 pt-9 pb-7 w-full h-full">
@@ -116,7 +118,7 @@ export const WriteEmailCard: React.FC<Props> = () => {
               <Dialog.Overlay className="DialogOverlay" />
 
               <Dialog.Content asChild>
-                <Card className="dialog-content w-[602px] h-[624px] p-5">
+                <Card className="flex flex-col dialog-content w-[602px] h-[624px] p-5 overflow-hidden">
                   <EmailPreviewDialog email={email} sheet={sheet} />
                 </Card>
               </Dialog.Content>

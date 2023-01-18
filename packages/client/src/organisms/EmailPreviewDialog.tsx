@@ -36,6 +36,8 @@ export const EmailPreviewDialog: React.FC<Props> = ({ email, sheet }) => {
   const activeRow = rows[activeIndex];
   const activeEmail = fillEmail(email, activeRow);
 
+  console.log({ activeEmail });
+
   return (
     <EmailPreview
       email={activeEmail}
